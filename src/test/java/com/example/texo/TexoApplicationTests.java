@@ -22,7 +22,7 @@ class TexoApplicationTests {
 
 		AwardIntervalDTO expectedResult = new AwardIntervalDTO("Joel Silver", 1, 1990, 1991);
 
-		assertEquals(minResult.size(), 1);
+		assertEquals(1, minResult.size());
 		assertEquals(firstResult.getProducer(), expectedResult.getProducer());
 		assertEquals(firstResult.getPreviousWin(), expectedResult.getPreviousWin());		
 		assertEquals(firstResult.getFollowinWin(), expectedResult.getFollowinWin());
@@ -36,7 +36,7 @@ class TexoApplicationTests {
 
 		AwardIntervalDTO expectedResult = new AwardIntervalDTO("Matthew Vaughn", 13, 2002, 2015);
 
-		assertEquals(maxResult.size(), 1);
+		assertEquals(1, maxResult.size());
 		assertEquals(expectedResult.getProducer(), firstResult.getProducer());
 		assertEquals(expectedResult.getPreviousWin(), firstResult.getPreviousWin());
 		assertEquals(expectedResult.getFollowinWin(), firstResult.getFollowinWin());
