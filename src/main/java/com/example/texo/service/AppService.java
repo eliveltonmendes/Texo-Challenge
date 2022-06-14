@@ -2,70 +2,99 @@ package com.example.texo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.texo.database.repository.ProducerRepository;
-import com.example.texo.dto.AwardIntervalDTO;
 import com.example.texo.dto.WinnerProducersDTO;
+import com.example.texo.dto.newDto.MoviesDTO;
+import com.example.texo.dto.newDto.ProducersDTO;
+import com.example.texo.dto.response.AwardIntervalDTO;
 
 @Service
 public class AppService {
 
     @Autowired
     private ProducerRepository producerRepository;
-    //2 - e o que obteve dois prêmios mais rápido,
 
-    public List<AwardIntervalDTO> getLongestAwardWinner() {
-        List<WinnerProducersDTO> winners = producerRepository.findProducerwinner();
-        Integer longestInterval = 13;
+    public List<AwardIntervalDTO> getLongestAwardWinner() {        
+        List<AwardIntervalDTO> awardIntervalDTOs = this.getAwardIntervalDTO();
         
-        for(var dto : winners) {
+        Integer longestInterval = 0;
+        for(var dto : awardIntervalDTOs) {
             if (dto.getInterval() == 0) continue;
             if(dto.getInterval() > longestInterval) {
                 longestInterval = dto.getInterval();
             }
         }
 
-        //1 - Obter o produtor com maior intervalo entre dois prêmios consecutivos, 
-        List<WinnerProducersDTO> longestProducers = new ArrayList<>();
-        for(var dto : winners) {
-            if (dto.getInterval() == longestInterval) {
-                longestProducers.add(dto);
-            }
-        }
-
         List<AwardIntervalDTO> maxResult = new ArrayList<>();
-        for(var dto : longestProducers) {
-            AwardIntervalDTO intervalDto = new AwardIntervalDTO(dto.getName(), dto.getInterval(), dto.getMinimo(), dto.getMaximo());
-            maxResult.add(intervalDto);
+        for(var dto : awardIntervalDTOs) {
+            if (dto.getInterval() == longestInterval) {
+                maxResult.add(dto);
+            }
         }
         return maxResult;
     }
 
     public List<AwardIntervalDTO> getShortestAwardWinner() {
-        List<WinnerProducersDTO> winners = producerRepository.findProducerwinner();
+        List<AwardIntervalDTO> awardIntervalDTOs = this.getAwardIntervalDTO();
+
         Integer shortestInterval = 99;
-        for(var dto : winners) {
+        for(var dto : awardIntervalDTOs) {
             if (dto.getInterval() == 0) continue;
             if(dto.getInterval() < shortestInterval) {
                 shortestInterval = dto.getInterval();
             }
         }
 
-        List<WinnerProducersDTO> shortestProducers = new ArrayList<>();
-        for(var dto : winners) {
+        List<AwardIntervalDTO> minResult = new ArrayList<>();
+        for(var dto : awardIntervalDTOs) {
             if (dto.getInterval() == shortestInterval) {
-                shortestProducers.add(dto);
+                minResult.add(dto);
             }
         }
 
-        List<AwardIntervalDTO> minResult = new ArrayList<>();
-        for(var dto : shortestProducers) {
-            AwardIntervalDTO intervalDto = new AwardIntervalDTO(dto.getName(), dto.getInterval(), dto.getMinimo(), dto.getMaximo());
-            minResult.add(intervalDto);
-        }
         return minResult;
+    }
+
+    private List<AwardIntervalDTO> getAwardIntervalDTO() {
+        List<WinnerProducersDTO> producersWhoWon = producerRepository.findProducerWithWinnerMovies();
+        List<ProducersDTO> movieWinners = producerRepository.findMovieWinners();
+        List<ProducersDTO> producers = new ArrayList<>();
+        for (WinnerProducersDTO winnerProducersDTO : producersWhoWon) {
+            List<ProducersDTO> producerMovies = movieWinners.stream()
+               .filter(o -> o.getProducer().equals(winnerProducersDTO.getName()))
+               .collect(Collectors.toList());
+            
+            List<MoviesDTO> movies = new ArrayList<>();
+            for(ProducersDTO movie : producerMovies) {
+                movies.add(new MoviesDTO(movie.getMovie(), movie.getYear()));
+            }
+
+            ProducersDTO producer = new ProducersDTO(winnerProducersDTO.getName(), movies);
+            producers.add(producer);
+        }
+
+        List<AwardIntervalDTO> awardIntervalDTOs = new ArrayList<>();
+        for (var producer: producers ) {
+            for (int i = 0; i < producer.getMovies().size(); i++) {
+                try{
+                    MoviesDTO previousMovie = producer.getMovies().get(i);
+                    MoviesDTO followinMovie = producer.getMovies().get(i + 1);
+                    if (followinMovie != null) {
+                        Integer interval = (followinMovie.getYear() - previousMovie.getYear());
+                        AwardIntervalDTO award = new AwardIntervalDTO(producer.getProducer(), interval, previousMovie.getYear(), followinMovie.getYear());
+                        awardIntervalDTOs.add(award);
+                    }
+                } catch(IndexOutOfBoundsException e) {
+                    continue;
+                }
+            }
+        }
+
+        return awardIntervalDTOs;
     }
 }
