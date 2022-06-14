@@ -1,4 +1,4 @@
-package com.example.texo.dto.newDto;
+package com.example.texo.dto;
 
 import java.util.List;
 

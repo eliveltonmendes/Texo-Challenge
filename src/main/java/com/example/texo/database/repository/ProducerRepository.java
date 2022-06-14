@@ -6,17 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.example.texo.database.entity.Producer;
+import com.example.texo.dto.ProducersDTO;
 import com.example.texo.dto.WinnerProducersDTO;
-import com.example.texo.dto.newDto.ProducersDTO;
 
 public interface ProducerRepository extends JpaRepository<Producer, Long> {
     public Producer findByName(String name);
 
-    //Capturar os produtores vencedores + filme, ano do filme em um dto
-    //Montar um dto com os períodos agrupados por produtor
-
-    // @Query(value = "select new com.example.texo.dto.newDto.ProducersDTO(p.name, new m.title, m.year) " +
-    @Query(value = "select new com.example.texo.dto.newDto.ProducersDTO(p.name, m.title, m.year) " +
+    @Query(value = "select new com.example.texo.dto.ProducersDTO(p.name, m.title, m.year) " +
         " from producer p" +
         " join p.movieProducers mp" +
         " join mp.movie m" +

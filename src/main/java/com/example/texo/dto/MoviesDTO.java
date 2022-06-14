@@ -1,4 +1,4 @@
-package com.example.texo.dto.newDto;
+package com.example.texo.dto;
 
 public class MoviesDTO {
     private String movie;

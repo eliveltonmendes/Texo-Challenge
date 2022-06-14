@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.texo.database.repository.ProducerRepository;
+import com.example.texo.dto.MoviesDTO;
+import com.example.texo.dto.ProducersDTO;
 import com.example.texo.dto.WinnerProducersDTO;
-import com.example.texo.dto.newDto.MoviesDTO;
-import com.example.texo.dto.newDto.ProducersDTO;
 import com.example.texo.dto.response.AwardIntervalDTO;
 
 @Service
