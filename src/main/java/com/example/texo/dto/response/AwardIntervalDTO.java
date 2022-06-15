@@ -1,4 +1,4 @@
-package com.example.texo.dto;
+package com.example.texo.dto.response;
 
 public class AwardIntervalDTO {
     private String producer;
